@@ -1,0 +1,18 @@
+The magnitude of normalized steady-state sensitivities: how a 1% perturbation of each parameter affects Pc (GFP).
+Theory:
+  =======
+  The steady-state sensitivity for the i-th element (state or reaction rate)
+  x_i wrt to the parameter p_j is defined by:
+ 
+  S_ij = [ Xss_i(p_j+delta_p_j) - Xss_i(p_j) ] / delta_p_j
+ 
+  where Xss_i is the function returning the steady-state for this element
+  (state or reaction rate) for the given parameters.
+ 
+  The normalized sensitivity index is defined by
+ 
+  Sn_ij = p_j/Xss_i(p_j) * S_ij
+ 
+  The function Xss(p) is here used as objective function (Varma et al. 
+  (1999) Parametric Sensitivity in Chemical Systems, Cambridge 
+  University Press, New York).

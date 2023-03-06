@@ -1,0 +1,148 @@
+********** MODEL NAME
+3node empty model
+
+********** MODEL NOTES
+
+
+
+********** MODEL STATE INFORMATION
+sg2(0) = 0.0141005629958423
+mRNAa(0) = 0.0147904684564814
+PIa(0) = 0.110202602751532
+Pa(0) = 0.0136193526747920
+sg2dCas(0) = 0.244502219686994
+sg2dCasGB(0) = 4.66247694364689
+mRNAb(0) = 0.763264953837417
+sg3(0) = 0.558434609139353
+PIb(0) = 0.190791653114957
+Pb(0) = 2.70110203285992
+sg3dCas(0) = 1627.40248961374
+sg3dCasGC(0) = 29.5226648362090
+
+********** MODEL PARAMETERS
+bSG2 = 1.94453377111195e-05
+bA = 0.000232828812421807
+kMAPIA = 0.0346736850000000
+kPIAPA = 0.000802343958059411
+dPA = 2.58819965305350e-05
+kfGBSG2 = 0.0480148502678806 
+kbGBSG2 = 0.0375346195978104
+kMBPIB = 0.0207303253637877
+kPIBPB = 0.0792611662639326
+dPB = 0.000134910422426505 
+kfGCSG3 = 0.0180956307207718 
+kbGCSG3 = 0.0481458153606397
+kMB = 1.47910838800000
+VMAX = 1.12477181126033 
+ARA = 0
+ARAN = 1.20019121543255 
+Km = 35.5177212999649 
+dmRNAcaseF = 31.2229914817512
+CasConcaseF = 6309.57344500000
+kfSGCASsg2 = 0.00242815485552822
+kbSGCASsg2 = 0.587890484545237
+kfSGCASsg3 = 0.0153160149809419
+kbSGCASsg3 = 0.0203613364654884
+kMB3 = 1.47910838800000
+
+********** MODEL VARIABLES
+GB = 30 - 1*sg2dCasGB %Removed algebraic relation                                                                      
+GC = 30 -1*sg3dCasGC %Removed algebraic relation 
+% GA = 30  - (((ARA^ARAN)*(30))/(Km^ARAN+ARA^ARAN))                                                        
+m = 0.002
+N = 1; % absolute number of cells in well, assume
+%OD600 of 1.0 = 8 x 108 cells/ml, so OD600 of 0.05 = 4e+07 cells/ml
+dCas = CasConcaseF - sg2dCas - sg2dCasGB - sg3dCas - sg3dCasGC
+% Functions
+Ara = ((ARA^ARAN))/(Km^ARAN+ARA^ARAN)
+
+********** MODEL REACTIONS
+
+ => sg2 : synsgRNA2 % induction of synthesis of sgRNA2 by Arabinose
+	vf = (Ara*(1-bSG2)*VMAX*(30 - 0))
+
+ => sg2 : synsgRNA2basal % basal levels of sgRNA2 wo Arabinose
+	vf = ((bSG2)*VMAX*(30 - 0))
+
+sg2 =>  : degsgRNA2 % degradation of sgRNA2
+	vf = (dmRNAcaseF)*sg2
+
+ => mRNAa : synmRNAa % induction of synthesis of mRNAa by Arabinose
+	vf = (Ara*(1-bA)*VMAX*(30 - 0 ))
+
+ => mRNAa : synmRNAabasal % basal levels of mRNAa wo Arabinose
+	vf = ((bA)*VMAX*(30 - 0))
+
+mRNAa =>  : degmRNAa % degradation of mRNAa
+	vf = (dmRNAcaseF)*mRNAa
+
+ mRNAa => PIa + mRNAa : synPIa % synthesis of immature protein a
+	vf = kMAPIA*mRNAa
+
+PIa =>  : degPIa % synthesis of immature protein a
+	vf = (dPA+m)*PIa
+
+PIa => Pa : synPa % synthesis of mature protein a
+	vf = kPIAPA*(PIa)
+
+Pa =>  : degPa % degradation of protein a
+	vf = (dPA+m)*Pa
+
+dCas+sg2 <=> sg2dCas : synsg2dCas % complex of sgRNA2/dCAs formation/dissociation
+	vf = kfSGCASsg2*sg2*dCas
+	vr = (kbSGCASsg2*sg2dCas)
+
+sg2dCas =>  : dilsg2dCas % dilution of sg2dCas
+	vf = m*sg2dCas
+
+sg2dCas+GB <=> sg2dCasGB : synsg2dCasGbB % complex sgRNA2/dCas/GbB
+	vf = kfGBSG2*GB*sg2dCas
+	vr = (kbGBSG2*sg2dCasGB)
+
+sg2dCasGB => GB : dilsg2dCasGbB % dilution of sgRNA2/dCas/GbB
+	vf = m*sg2dCasGB
+
+ => mRNAb : synmRNAb % synthesis of mRNAb and sgRNA 3
+	vf = (kMB)*GB
+
+mRNAb =>  : degmRNAb % degradation of mRNAb
+	vf = (dmRNAcaseF)*mRNAb
+
+mRNAb => PIb + mRNAb : synPIb % synthesis of immature protein b
+	vf = (kMBPIB*mRNAb)
+
+PIb =>  : degPIb % degradation of immature protein b
+	vf = (dPB+m)*PIb
+
+PIb => Pb : synPb % synthesis of mature protein b
+	vf = kPIBPB*PIb
+
+Pb =>  : degPb % degradation of protein b
+	vf = (dPB+m)*Pb
+
+=> sg3 : synsg3 % synthesis of mRNAb and sgRNA 3
+	vf = (kMB3)*GB
+
+sg3 =>  : degsgRNA3 % degradation of sgRNA3
+	vf = (dmRNAcaseF)*sg3
+
+dCas+sg3 <=> sg3dCas : synsg3dCas % complex of sgRNA3/dCAs formation/dissociation
+	vf = kfSGCASsg3*sg3*dCas
+	vr = (kbSGCASsg3*sg3dCas)
+
+sg3dCas =>  : dilsg3dCas % dilution of sg3dCas
+	vf = m*sg3dCas
+
+sg3dCas+GC <=> sg3dCasGC : synsg3dCasGbC % complex sgRNA3/dCas/GbC formation dissociation
+	vf = kfGCSG3*GC*sg3dCas
+	vr = (kbGCSG3*sg3dCasGC)
+
+sg3dCasGC => GC : dilsg3dCasGbC % dilution of sgRNA3/dCas/GbC
+	vf = m*sg3dCasGC
+
+********** MODEL FUNCTIONS
+
+
+********** MODEL EVENTS
+
+********** MODEL MATLAB FUNCTIONS

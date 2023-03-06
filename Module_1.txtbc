@@ -1,0 +1,86 @@
+********** MODEL NAME
+3node empty model
+
+********** MODEL NOTES
+
+
+
+********** MODEL STATE INFORMATION
+mRNAa(0) = 0.0147904684564814
+PIa(0) = 0.110202602751532
+Pa(0) = 0.0136193526747920
+mRNAc(0) = 0.00238417416268546
+PIc(0) = 0.000323457976524678
+Pc(0) = 0.388524974513058
+
+********** MODEL PARAMETERS
+bA = 0.000233954952715471
+kMAPIA = 0.0346736850000000
+kPIAPA = 0.000802553752411944
+dPA = 2.59914984831252e-05
+kMC = 1.47910838800000
+kMCPIC = 0.134040774824518
+kPICPC = 0.977765727164872
+dPC = 3.88192717680288e-05
+VMAX = 1.14638267837807
+ARA = 0
+dmRNAcaseF = 30.9100643332987
+ARAN = 1.20022787279342
+Km = 35.5634922097737
+
+********** MODEL VARIABLES                                                      
+GC=30
+m = 0.002
+N = 1; % absolute number of cells in well, assume
+%OD600 of 1.0 = 8 x 108 cells/ml, so OD600 of 0.05 = 4e+07 cells/ml
+% Functions
+Ara = ((ARA^ARAN))/(Km^ARAN+ARA^ARAN)
+
+********** MODEL REACTIONS
+ => mRNAa : synmRNAa % induction of synthesis of mRNAa by Arabinose
+	vf = (Ara*(1-bA)*VMAX*(30 - 0 ))
+
+ => mRNAa : synmRNAabasal % basal levels of mRNAa wo Arabinose
+	vf = ((bA)*VMAX*(30 - 0))
+
+mRNAa =>  : degmRNAa % degradation of mRNAa
+	vf = (dmRNAcaseF)*mRNAa
+
+ mRNAa => PIa + mRNAa : synPIa % synthesis of immature protein a
+	vf = kMAPIA*mRNAa
+
+PIa =>  : degPIa % synthesis of immature protein a
+	vf = (dPA+m)*PIa
+
+PIa => Pa : synPa % synthesis of mature protein a
+	vf = kPIAPA*(PIa)
+
+Pa =>  : degPa % degradation of protein a
+	vf = (dPA+m)*Pa
+
+ => mRNAc : synmRNAc % synthesis of mRNAc
+	vf = (kMC)*GC
+
+mRNAc =>  : degmRNAc % degradation of mRNAc
+	vf = (dmRNAcaseF)*mRNAc
+	
+mRNAc => mRNAc + PIc : synPIc % synthesis of immature protein c
+	vf = kMCPIC*mRNAc
+
+PIc =>  : degPIc % degradation of immature protein c
+	vf = (dPC+m)*PIc
+
+PIc => Pc : synPc % synthesis of mature protein c
+	vf = kPICPC*PIc
+
+Pc =>  : degPc % degradation of protein c
+	vf = (dPC+m)*Pc
+
+
+********** MODEL FUNCTIONS
+
+
+********** MODEL EVENTS
+
+********** MODEL MATLAB FUNCTIONS
+

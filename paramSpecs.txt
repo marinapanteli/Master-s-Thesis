@@ -1,0 +1,5 @@
+names,projections,bmin,bmax,islog, p0
+mu, 0, 0, 100, 0, 1.02
+mu2, 0, 0, 100, 0, 1.99
+R, 1e50, 1e-6, 50, 0, 5
+kt, 0, 0, 100, 0, 1e-6

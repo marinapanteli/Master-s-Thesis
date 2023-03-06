@@ -1,0 +1,308 @@
+********** MODEL NAME
+3node empty model
+
+********** MODEL NOTES
+
+
+
+********** MODEL STATE INFORMATION
+sg1(0) = 0
+sg2(0) = 0
+mRNAa(0) = 0
+PIa(0) = 0
+Pa(0) = 0
+sg1dCas(0) = 0
+sg1dCasGC(0) = 0
+sg2dCas(0) = 0
+sg2dCasGB(0) = 0
+mRNAb(0) = 0
+sg3(0) = 0
+PIb(0) = 0
+Pb(0) = 0
+sg3dCas(0) = 0
+sg3dCasGC(0) = 0
+mRNAc(0) = 0
+PIc(0) = 0
+Pc(0) = 0
+sg4(0) = 0
+sg4dCas(0) = 0
+sg4dCasGB(0) = 0
+sg5(0) = 0 
+sg5dCas(0) = 0
+sg5dCasGA(0) = 0
+sg6(0) = 0
+sg6dCas(0) = 0
+sg6dCasGA(0) = 0
+ 
+
+ 
+
+
+********** MODEL PARAMETERS
+
+bSG1 = 0
+bSG2 = 0
+bA = 0
+kMAPIA = 0
+kPIAPA = 0
+dPA = 0
+kfSGCAS = 0  
+kbSGCAS = 0
+kfGCSG1 = 0
+kbGCSG1 =  0
+kfGBSG2 = 0 
+kbGBSG2 = 0
+kMBPIB = 0
+kPIBPB = 0
+dPB = 0 
+kfGCSG3 = 0 
+kbGCSG3 = 0
+kMB = 0
+kMC = 0
+kMCPIC = 0
+kPICPC = 0
+dPC = 0
+VMAX = 0 
+ARA = 0 
+ARAN = 0 
+Km = 0 
+para1 = 0
+para2 = 0
+para3 = 0
+para4 = 0
+para5 = 0
+para6 = 0
+para7 = 0
+para8 = 0
+para9 = 0
+para10 = 0
+para11 = 0
+para12 = 0
+para13 = 0
+dmRNAcaseF = 0
+CasConcaseF = 0
+kfGBSG4 = 0
+kbGBSG4 =  0
+kfGASG5 = 0
+kbGASG5 =  0
+kfGASG6 = 0
+kbGASG6 =  0
+kfSGCASsg1 = 0
+kbSGCASsg1 = 0
+kfSGCASsg2 = 0
+kbSGCASsg2 = 0
+kfSGCASsg3 = 0
+kbSGCASsg3 = 0
+kfSGCASsg4 = 0
+kbSGCASsg4 = 0
+kfSGCASsg5 = 0
+kbSGCASsg5 = 0
+kfSGCASsg6 = 0
+kbSGCASsg6 = 0
+kMC5 = 0
+kMC4 = 0
+kMB3 = 0
+kMB6 = 0
+********** MODEL VARIABLES
+GB = 30 - 1*sg2dCasGB - sg4dCasGB  %Removed algebraic relation                                                                      
+GC = 30 -1*sg1dCasGC-1*sg3dCasGC %Removed algebraic relation 
+GA = 30 - sg5dCasGA - sg6dCasGA - (((ARA^ARAN)*(30 - sg5dCasGA - sg6dCasGA))/(Km^ARAN+ARA^ARAN))                                                        
+m = 0.002
+N = 1e+08*((para2/((1 + para3*exp(-para4*time))^(1/para5)))+(para6/((1 + para7*exp(-para8*time))^(1/para9)))+(para10/((1 + para11*exp(-para12*time))^(1/para13))) + para1); % absolute number of cells in well, assume
+%OD600 of 1.0 = 8 x 108 cells/ml, so OD600 of 0.05 = 4e+07 cells/ml
+dCas = CasConcaseF - sg1dCas - sg2dCas - sg1dCasGC - sg2dCasGB - sg3dCas - sg3dCasGC - sg4dCas - sg4dCasGB -sg5dCas - sg5dCasGA - sg6dCas - sg6dCasGA
+% Functions
+Ara = ((ARA^ARAN))/(Km^ARAN+ARA^ARAN)
+
+********** MODEL REACTIONS
+
+ => sg1 : synsgRNA1 % induction of synthesis of sgRNA1 by Arabinose
+	vf = (Ara*(1-bSG1)*VMAX*(30 - sg5dCasGA - sg6dCasGA))
+
+ => sg1 : synsgRNA1basal % basal levels of sgRNA1 wo Arabinose
+	vf = ((bSG1)*VMAX*(30 - sg5dCasGA - sg6dCasGA))
+
+sg1 =>  : degsgRNA1 % degradation of sgRNA1
+	vf = (dmRNAcaseF)*sg1
+
+ => sg2 : synsgRNA2 % induction of synthesis of sgRNA2 by Arabinose
+	vf = (Ara*(1-bSG2)*VMAX*(30 - sg5dCasGA - sg6dCasGA))
+
+ => sg2 : synsgRNA2basal % basal levels of sgRNA2 wo Arabinose
+	vf = ((bSG2)*VMAX*(30 - sg5dCasGA - sg6dCasGA))
+
+sg2 =>  : degsgRNA2 % degradation of sgRNA2
+	vf = (dmRNAcaseF)*sg2
+
+ => mRNAa : synmRNAa % induction of synthesis of mRNAa by Arabinose
+	vf = (Ara*(1-bA)*VMAX*(30 - sg5dCasGA - sg6dCasGA))
+
+ => mRNAa : synmRNAabasal % basal levels of mRNAa wo Arabinose
+	vf = ((bA)*VMAX*(30 - sg5dCasGA - sg6dCasGA))
+
+mRNAa =>  : degmRNAa % degradation of mRNAa
+	vf = (dmRNAcaseF)*mRNAa
+
+ mRNAa => PIa + mRNAa : synPIa % synthesis of immature protein a
+	vf = kMAPIA*mRNAa
+
+PIa =>  : degPIa % synthesis of immature protein a
+	vf = (dPA+m)*PIa
+
+PIa => Pa : synPa % synthesis of mature protein a
+	vf = kPIAPA*(PIa)
+
+Pa =>  : degPa % degradation of protein a
+	vf = (dPA+m)*Pa
+
+dCas+sg1 <=> sg1dCas : synsg1dCas % complex of sgRNA1/dCAs formation/dissociation
+	vf = kfSGCASsg1*sg1*dCas
+	vr = (kbSGCASsg1*sg1dCas)
+
+sg1dCas =>  : dilsg1dCas % dilution of sg1dCas
+	vf = m*sg1dCas
+
+sg1dCas+GC <=> sg1dCasGC : synsg1dCasGbC % complex sgRNA1/dCas/GbC formation dissociation
+	vf = kfGCSG1*GC*sg1dCas
+	vr = (kbGCSG1*sg1dCasGC)
+
+sg1dCasGC => GC : dilsg1dCasGbC % dilution of sgRNA/dCas/GbC
+	vf = m*sg1dCasGC
+
+dCas+sg2 <=> sg2dCas : synsg2dCas % complex of sgRNA2/dCAs formation/dissociation
+	vf = kfSGCASsg2*sg2*dCas
+	vr = (kbSGCASsg2*sg2dCas)
+
+sg2dCas =>  : dilsg2dCas % dilution of sg2dCas
+	vf = m*sg2dCas
+
+sg2dCas+GB <=> sg2dCasGB : synsg2dCasGbB % complex sgRNA2/dCas/GbB
+	vf = kfGBSG2*GB*sg2dCas
+	vr = (kbGBSG2*sg2dCasGB)
+
+sg2dCasGB => GB : dilsg2dCasGbB % dilution of sgRNA2/dCas/GbB
+	vf = m*sg2dCasGB
+
+ => mRNAb : synmRNAb % synthesis of mRNAb and sgRNA 3
+	vf = (kMB)*GB
+
+ => sg3 : synsg3 % synthesis of mRNAb and sgRNA 3
+	vf = (kMB3)*GB
+
+ => sg6 : synsg6 % synthesis of mRNAb and sgRNA 3
+	vf = (kMB6)*GB
+
+mRNAb =>  : degmRNAb % degradation of mRNAb
+	vf = (dmRNAcaseF)*mRNAb
+
+mRNAb => PIb + mRNAb : synPIb % synthesis of immature protein b
+	vf = (kMBPIB*mRNAb)
+
+PIb =>  : degPIb % degradation of immature protein b
+	vf = (dPB+m)*PIb
+
+PIb => Pb : synPb % synthesis of mature protein b
+	vf = kPIBPB*PIb
+
+Pb =>  : degPb % degradation of protein b
+	vf = (dPB+m)*Pb
+
+sg3 =>  : degsgRNA3 % degradation of sgRNA3
+	vf = (dmRNAcaseF)*sg3
+
+dCas+sg3 <=> sg3dCas : synsg3dCas % complex of sgRNA3/dCAs formation/dissociation
+	vf = kfSGCASsg3*sg3*dCas
+	vr = (kbSGCASsg3*sg3dCas)
+
+sg3dCas =>  : dilsg3dCas % dilution of sg3dCas
+	vf = m*sg3dCas
+
+sg3dCas+GC <=> sg3dCasGC : synsg3dCasGbC % complex sgRNA3/dCas/GbC formation dissociation
+	vf = kfGCSG3*GC*sg3dCas
+	vr = (kbGCSG3*sg3dCasGC)
+
+sg3dCasGC => GC : dilsg3dCasGbC % dilution of sgRNA3/dCas/GbC
+	vf = m*sg3dCasGC
+
+ => mRNAc : synmRNAc % synthesis of mRNAc
+	vf = (kMC)*GC
+
+ => sg4: synsg4 % synthesis of mRNAc
+	vf = (kMC4)*GC
+
+ => sg5 : synsg5 % synthesis of mRNAc
+	vf = (kMC5)*GC
+
+mRNAc =>  : degmRNAc % degradation of mRNAc
+	vf = (dmRNAcaseF)*mRNAc
+	
+sg4 =>  : degsgRNA4 % degradation of sgrna4
+	vf = (dmRNAcaseF)*sg4
+
+sg5 =>  : degsgRNA5 % degradation of sgrna5
+	vf = (dmRNAcaseF)*sg5
+
+mRNAc => mRNAc + PIc : synPIc % synthesis of immature protein c
+	vf = kMCPIC*mRNAc
+
+PIc =>  : degPIc % degradation of immature protein c
+	vf = (dPC+m)*PIc
+
+PIc => Pc : synPc % synthesis of mature protein c
+	vf = kPICPC*PIc
+
+Pc =>  : degPc % degradation of protein c
+	vf = (dPC+m)*Pc
+
+dCas+sg4 <=> sg4dCas : synsg4dCas % complex of sgRNA4/dCAs formation/dissociation
+	vf = kfSGCASsg4*sg4*dCas
+	vr = (kbSGCASsg4*sg4dCas)
+
+sg4dCas =>  : dilsg4dCas % dilution of sg4dCas
+	vf = m*sg4dCas
+
+sg4dCas+GB <=> sg4dCasGB : synsg4dCasGbB % complex sgRNA4/dCas/GbB
+	vf = kfGBSG4*GB*sg4dCas
+	vr = (kbGBSG4*sg4dCasGB)
+
+sg4dCasGB => GB : dilsg4dCasGbB % dilution of sgRNA4/dCas/GbB
+	vf = m*sg4dCasGB
+
+dCas+sg5 <=> sg5dCas : synsg5dCas % complex of sgRNA5/dCAs formation/dissociation
+	vf = kfSGCASsg5*sg5*dCas
+	vr = (kbSGCASsg5*sg5dCas)
+
+sg5dCas =>  : dilsg5dCas % dilution of sg5dCas
+	vf = m*sg5dCas
+
+sg5dCas+GA <=> sg5dCasGA : synsg5dCasGbA % complex sgRNA5/dCas/GbA
+	vf = kfGASG5*GA*sg5dCas
+	vr = (kbGASG5*sg5dCasGA)
+
+sg5dCasGA => GA : dilsg5dCasGbA % dilution of sgRNA5/dCas/GbA
+	vf = m*sg5dCasGA
+	
+sg6 =>  : degsgRNA6 % degradation of sgRNA6
+	vf = (dmRNAcaseF)*sg6	
+	
+dCas+sg6 <=> sg6dCas : synsg6dCas % complex of sgRNA6/dCAs formation/dissociation
+vf = kfSGCASsg6*sg6*dCas
+vr = (kbSGCASsg6*sg6dCas)
+
+sg6dCas =>  : dilsg6dCas % dilution of sg6dCas
+	vf = m*sg6dCas
+
+sg6dCas+GA <=> sg6dCasGA : synsg6dCasGbA % complex sgRNA6/dCas/GbA
+	vf = kfGASG6*GA*sg6dCas
+	vr = (kbGASG6*sg6dCasGA)
+
+sg6dCasGA => GA : dilsg6dCasGbA % dilution of sgRNA6/dCas/GbA
+	vf = m*sg6dCasGA
+
+********** MODEL FUNCTIONS
+
+
+********** MODEL EVENTS
+
+********** MODEL MATLAB FUNCTIONS
+

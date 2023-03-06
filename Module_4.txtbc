@@ -1,0 +1,154 @@
+********** MODEL NAME
+3node empty model
+
+********** MODEL NOTES
+
+
+
+********** MODEL STATE INFORMATION
+sg1(0) = 0.0145254946066617
+mRNAa(0) = 0.0147904684564814
+PIa(0) = 0.110202602751532
+Pa(0) = 0.0136193526747920
+sg1dCas(0) = 1.40239383767706
+sg1dCasGC(0) = 0.427009813782046
+mRNAc(0) = 0.00238417416268546
+PIc(0) = 0.000323457976524678
+Pc(0) = 0.388524974513058
+sg5(0) = 0.00239325488016666 
+sg5dCas(0) = 0.103352323786479
+sg5dCasGA(0) = 0.291024053407812
+
+ 
+
+ 
+
+
+********** MODEL PARAMETERS
+
+bSG1 = 2.01507706886218e-05
+bA = 0.000232828812421807
+kMAPIA = 0.0346736850000000
+kPIAPA = 0.000802343958059411
+dPA = 2.58819965305350e-05
+kfGCSG1 = 0.0594091010658326
+kbGCSG1 =  0.0113168067037314
+kMC = 1.47910838800000
+kMCPIC = 0.133237179985474
+kPICPC = 0.981893612680402
+dPC = 3.88274570489779e-05
+VMAX = 1.12477181126033 
+ARA = 0
+ARAN = 1.20019121543255 
+Km = 35.5177212999649 
+dmRNAcaseF = 31.2229914817512
+CasConcaseF = 6309.57344500000
+kfGASG5 = 0.0112895121036029
+kbGASG5 =  0.118229245241026
+kfSGCASsg1 = 0.0158647087399854
+kbSGCASsg1 = 0.758580740080161
+kfSGCASsg5 = 0.00352198625483236
+kbSGCASsg5 = 0.379688961166798
+kMC5 = 1.47910838800000
+********** MODEL VARIABLES
+GC = 30 -1*sg1dCasGC %Removed algebraic relation 
+GA = 30 - sg5dCasGA - (((ARA^ARAN)*(30 - sg5dCasGA ))/(Km^ARAN+ARA^ARAN))                                                        
+m = 0.002
+N = 1; % absolute number of cells in well, assume
+%OD600 of 1.0 = 8 x 108 cells/ml, so OD600 of 0.05 = 4e+07 cells/ml
+dCas = CasConcaseF - sg1dCas - sg1dCasGC -sg5dCas - sg5dCasGA 
+% Functions
+Ara = ((ARA^ARAN))/(Km^ARAN+ARA^ARAN)
+
+********** MODEL REACTIONS
+
+ => sg1 : synsgRNA1 % induction of synthesis of sgRNA1 by Arabinose
+	vf = (Ara*(1-bSG1)*VMAX*(30 - sg5dCasGA))
+
+ => sg1 : synsgRNA1basal % basal levels of sgRNA1 wo Arabinose
+	vf = ((bSG1)*VMAX*(30 - sg5dCasGA))
+
+sg1 =>  : degsgRNA1 % degradation of sgRNA1
+	vf = (dmRNAcaseF)*sg1
+
+ => mRNAa : synmRNAa % induction of synthesis of mRNAa by Arabinose
+	vf = (Ara*(1-bA)*VMAX*(30 - sg5dCasGA ))
+
+ => mRNAa : synmRNAabasal % basal levels of mRNAa wo Arabinose
+	vf = ((bA)*VMAX*(30 - sg5dCasGA))
+
+mRNAa =>  : degmRNAa % degradation of mRNAa
+	vf = (dmRNAcaseF)*mRNAa
+
+ mRNAa => PIa + mRNAa : synPIa % synthesis of immature protein a
+	vf = kMAPIA*mRNAa
+
+PIa =>  : degPIa % synthesis of immature protein a
+	vf = (dPA+m)*PIa
+
+PIa => Pa : synPa % synthesis of mature protein a
+	vf = kPIAPA*(PIa)
+
+Pa =>  : degPa % degradation of protein a
+	vf = (dPA+m)*Pa
+
+dCas+sg1 <=> sg1dCas : synsg1dCas % complex of sgRNA1/dCAs formation/dissociation
+	vf = kfSGCASsg1*sg1*dCas
+	vr = (kbSGCASsg1*sg1dCas)
+
+sg1dCas =>  : dilsg1dCas % dilution of sg1dCas
+	vf = m*sg1dCas
+
+sg1dCas+GC <=> sg1dCasGC : synsg1dCasGbC % complex sgRNA1/dCas/GbC formation dissociation
+	vf = kfGCSG1*GC*sg1dCas
+	vr = (kbGCSG1*sg1dCasGC)
+
+sg1dCasGC => GC : dilsg1dCasGbC % dilution of sgRNA/dCas/GbC
+	vf = m*sg1dCasGC
+
+ => mRNAc : synmRNAc % synthesis of mRNAc
+	vf = (kMC)*GC
+
+ => sg5 : synsg5 % synthesis of mRNAc
+	vf = (kMC5)*GC
+
+mRNAc =>  : degmRNAc % degradation of mRNAc
+	vf = (dmRNAcaseF)*mRNAc
+	
+sg5 =>  : degsgRNA5 % degradation of sgrna5
+	vf = (dmRNAcaseF)*sg5
+
+mRNAc => mRNAc + PIc : synPIc % synthesis of immature protein c
+	vf = kMCPIC*mRNAc
+
+PIc =>  : degPIc % degradation of immature protein c
+	vf = (dPC+m)*PIc
+
+PIc => Pc : synPc % synthesis of mature protein c
+	vf = kPICPC*PIc
+
+Pc =>  : degPc % degradation of protein c
+	vf = (dPC+m)*Pc
+
+dCas+sg5 <=> sg5dCas : synsg5dCas % complex of sgRNA5/dCAs formation/dissociation
+	vf = kfSGCASsg5*sg5*dCas
+	vr = (kbSGCASsg5*sg5dCas)
+
+sg5dCas =>  : dilsg5dCas % dilution of sg5dCas
+	vf = m*sg5dCas
+
+sg5dCas+GA <=> sg5dCasGA : synsg5dCasGbA % complex sgRNA5/dCas/GbA
+	vf = kfGASG5*GA*sg5dCas
+	vr = (kbGASG5*sg5dCasGA)
+
+sg5dCasGA => GA : dilsg5dCasGbA % dilution of sgRNA5/dCas/GbA
+	vf = m*sg5dCasGA
+
+
+********** MODEL FUNCTIONS
+
+
+********** MODEL EVENTS
+
+********** MODEL MATLAB FUNCTIONS
+
